@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "AdminUser": {
+      "title": "Admin User",
+      "description": "Admin or staff account for the CRM",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "staff"] },
+        "displayName": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Page": {
+      "title": "Facebook Page",
+      "description": "Meta Page configuration",
+      "type": "object",
+      "properties": {
+        "pageId": { "type": "string" },
+        "pageName": { "type": "string" },
+        "accessToken": { "type": "string" },
+        "verifyToken": { "type": "string" }
+      },
+      "required": ["pageId", "accessToken"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Messenger customer (PSID)",
+      "type": "object",
+      "properties": {
+        "psid": { "type": "string" },
+        "name": { "type": "string" },
+        "lastInteraction": { "type": "string", "format": "date-time" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" },
+        "optIn": { "type": "boolean" }
+      },
+      "required": ["psid"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Individual message in a conversation",
+      "type": "object",
+      "properties": {
+        "mid": { "type": "string" },
+        "text": { "type": "string" },
+        "senderId": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["inbound", "outbound"] },
+        "status": { "type": "string" }
+      },
+      "required": ["mid", "senderId", "recipientId", "timestamp", "type"]
+    },
+    "Template": {
+      "title": "Message Template",
+      "description": "Reusable message templates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "content": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "name", "content"]
+    },
+    "Campaign": {
+      "title": "Broadcast Campaign",
+      "description": "Broadcast campaign metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "content": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "running", "completed", "failed"] },
+        "targetSegment": { "type": "object" },
+        "totalRecipients": { "type": "integer" },
+        "sentCount": { "type": "integer" },
+        "failedCount": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "content", "status"]
+    },
+    "CampaignRecipient": {
+      "title": "Campaign Recipient",
+      "description": "Status of a recipient in a campaign",
+      "type": "object",
+      "properties": {
+        "psid": { "type": "string" },
+        "status": { "type": "string", "enum": ["queued", "sent", "failed", "skipped"] },
+        "error": { "type": "string" },
+        "sentAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["psid", "status"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "Log of important actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "action": { "type": "string" },
+        "performedBy": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "details": { "type": "object" }
+      },
+      "required": ["id", "action", "performedBy", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/admins/{uid}": { "schema": "AdminUser", "description": "Admin users" },
+    "/pages/{pageId}": { "schema": "Page", "description": "Facebook Pages" },
+    "/customers/{psid}": { "schema": "Customer", "description": "Customers" },
+    "/conversations/{psid}/messages/{messageId}": { "schema": "Message", "description": "Messages in a conversation" },
+    "/templates/{templateId}": { "schema": "Template", "description": "Message templates" },
+    "/campaigns/{campaignId}": { "schema": "Campaign", "description": "Campaigns" },
+    "/campaigns/{campaignId}/recipients/{psid}": { "schema": "CampaignRecipient", "description": "Campaign recipients" },
+    "/audit_logs/{logId}": { "schema": "AuditLog", "description": "Audit logs" }
+  }
+}

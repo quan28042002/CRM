@@ -1,0 +1,5 @@
+{
+  "name": "Messenger Fanpage CRM",
+  "description": "A compliant CRM for managing Facebook Fanpage messages with broadcast capabilities following Meta policies.",
+  "requestFramePermissions": []
+}

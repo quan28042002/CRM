@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin' ||
+        request.auth.token.email == "quan28042002@gmail.com"
+      );
+    }
+    function isStaff() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['admin', 'staff'] ||
+        request.auth.token.email == "quan28042002@gmail.com"
+      );
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /admins/{uid} {
+      allow read: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /pages/{pageId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /customers/{psid} {
+      allow read, write: if isStaff();
+    }
+
+    match /conversations/{psid}/messages/{messageId} {
+      allow read, write: if isStaff();
+    }
+
+    match /templates/{templateId} {
+      allow read, write: if isStaff();
+    }
+
+    match /campaigns/{campaignId} {
+      allow read, write: if isStaff();
+      
+      match /recipients/{psid} {
+        allow read, write: if isStaff();
+      }
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+    }
+  }
+}
